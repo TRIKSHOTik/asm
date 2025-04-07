@@ -1,36 +1,7 @@
 #include <iostream>
 
-//(x^5 + 2*(x^2 - 4) + x) / x^3
-int calculate_expression1(int x) {
-    int result;
-    __asm {
-        mov eax, x
-        mov ecx, eax
-        imul ecx, eax
-        imul ecx, eax
-        mov ebx, ecx
-        imul ecx, eax
-        imul ecx, eax
-
-        mov edx, eax
-        imul edx, eax
-        sub edx, 4
-        shl edx, 1
-
-        add ecx, edx
-        add ecx, eax
-
-        mov eax, ecx
-        cdq
-        idiv ebx
-
-        mov result, eax
-    }
-    return result;
-}
-
 //((2*x - 1)*(2*x + 1)*(x + 3)) / (2*x)
-int calculate_expression2(int x) {
+int calculate_expression(int x) {
     int result;
     __asm {
         mov eax, x
@@ -57,23 +28,25 @@ int calculate_expression2(int x) {
     return result;
 }
 
-//((4*x - 1)*(4*x + 1)) / 4
-int calculate_expression3(int x) {
+//Сумма цифр натурального числа
+int sum_of_digits(int x) {
     int result;
     __asm {
         mov eax, x
+        xor ebx, ebx
 
-        shl eax, 2
-        mov ecx, eax
-        sub ecx, 1
-        add eax, 1
-        imul eax, ecx
+        sum_loop :
+        test eax, eax
+            jz end_loop
 
-        cdq
-        mov ecx, 4
-        idiv ecx
+            xor edx, edx
+            mov ecx, 10
+            div ecx
+            add ebx, edx
+            jmp sum_loop
 
-        mov result, eax
+            end_loop :
+        mov result, ebx
     }
     return result;
 }
@@ -83,13 +56,12 @@ int main() {
     std::cout << "Введите значение x: ";
     std::cin >> x;
 
-    int result1 = calculate_expression1(x);
-    int result2 = calculate_expression2(x);
-    int result3 = calculate_expression3(x);
+    int result = calculate_expression(x);
 
-    std::cout << "Результат 1: " << result1 << std::endl;
-    std::cout << "Результат 2: " << result2 << std::endl;
-    std::cout << "Результат 3: " << result3 << std::endl;
+    std::cout << "Результат: " << result << std::endl;
+
+    int sum = sum_of_digits(x);
+    std::cout << "Сумма цифр числа: " << sum << std::endl;
 
     return 0;
 }
